@@ -55,16 +55,21 @@ Get-SecondWednesday
 Function Get-FileSize($path) {
     #                 -----
     #                   ╰→ The naming choice can help users determine what
-    #                       datatype you are expecting
+    #                      datatype you are expecting
 
     # We only have file path, get the actual file so we
     # can access the 'Length' property
     $file = Get-Item -Path $path
 
+    #[MATH]::Round(FILE_SIZE, DECIMAL_PLACES)
+
     Write-Host "File size:"
-    Write-Host "   $($file.Length / 1KB) KB"
-    Write-Host "   $($file.Length / 1MB) MB"
-    Write-Host "   $($file.Length / 1GB) GB"
+    Write-Host "   $([Math]::Round($file.Length / 1KB, 2)) KB"
+    Write-Host "   $([Math]::Round($file.Length / 1MB, 2)) MB"
+    Write-Host "   $([Math]::Round($file.Length / 1GB, 2)) GB"
+    # Write-Host "   $($file.Length / 1KB) KB"
+    # Write-Host "   $($file.Length / 1MB) MB"
+    # Write-Host "   $($file.Length / 1GB) GB"
 }
 
 Get-FileSize (Get-ChildItem -Path "C:\Users\TimDavis\Downloads" -File | Sort-Object Length -Desc)[0].FullName
@@ -73,15 +78,16 @@ Get-FileSize (Get-ChildItem -Path "C:\Users\TimDavis\Downloads" -File | Sort-Obj
 Function Get-FileSize($file) {
 
     Write-Host "File size:"
-    # Write-Host "   $([Math]::Round($file.Length / 1KB, 2)) KB"
-    # Write-Host "   $([Math]::Round($file.Length / 1MB, 2)) MB"
-    # Write-Host "   $([Math]::Round($file.Length / 1GB, 2)) GB"
-    Write-Host "   $($file.Length / 1KB) KB"
-    Write-Host "   $($file.Length / 1MB) MB"
-    Write-Host "   $($file.Length / 1GB) GB"
+    Write-Host "   $([Math]::Round($file.Length / 1KB, 2)) KB"
+    Write-Host "   $([Math]::Round($file.Length / 1MB, 2)) MB"
+    Write-Host "   $([Math]::Round($file.Length / 1GB, 2)) GB"
+    # Write-Host "   $($file.Length / 1KB) KB"
+    # Write-Host "   $($file.Length / 1MB) MB"
+    # Write-Host "   $($file.Length / 1GB) GB"
 }
 
-Get-FileSize (Get-ChildItem -Path "C:\Users\TimDavis\Downloads" -File | Sort-Object Length -Desc)[0]
+$fileObject = (Get-ChildItem -Path "C:\Users\TimDavis\Downloads" -File | Sort-Object Length -Desc) | Select-Object -First 1
+Get-FileSize $fileObject
 
 #> >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #> Exercise 6.5.2 Q1 - Advanced Function with -Verbose
@@ -91,10 +97,10 @@ Function Get-FileSize() {
     [CmdletBinding()]
 
     param(
-        [String]$path
+        [String]$Path
     )
 
-    $file = Get-Item -Path $path
+    $file = Get-Item -Path $Path
 
     # Let user know what file we are working with
     Write-Verbose -Message "Working with file: $($file.Name)"
@@ -115,10 +121,10 @@ Function Get-FileSize() {
     [CmdletBinding()]
 
     param(
-        [String]$path
+        [String]$Path
     )
 
-    $file = Get-Item -Path $path
+    $file = Get-Item -Path $Path
 
     # Show user what file we are working with, -Debug will ask the
     # user if they want to continue or not
@@ -126,6 +132,9 @@ Function Get-FileSize() {
 
     Write-Host "File size:"
     Write-Host "   $($file.Length / 1KB) KB"
+
+    Write-Debug -Message "Getting ready to calculate MB file size"
+
     Write-Host "   $($file.Length / 1MB) MB"
     Write-Host "   $($file.Length / 1GB) GB"
 }
@@ -140,7 +149,9 @@ Function Get-FileInfo() {
     [CmdletBinding()]
 
     param(
+        [Parameter(Mandatory=$true, Position=0)]
         [String]$Path,
+        [Parameter(Mandatory=$true, Position=1)]
         [String]$FileName
     )
 
@@ -160,6 +171,7 @@ $testFile = (Get-ChildItem -Path "C:\Users\TimDavis\Downloads" -File | Sort-Obje
 
 Get-FileInfo -Path $testFile.Directory.FullName -FileName $testFile.Name
 
+
 #> >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #> Exercise 6.5.3 Q2 - Advanced Function with Repeating Message
 #> >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -170,7 +182,7 @@ Function Show-Message() {
 
     param(
         [String]$Message,
-        [Int]$Repeat
+        [int]$Repeat
     )
 
     for($counter=1;$counter -le $Repeat;$counter++) {
@@ -219,10 +231,10 @@ Function Show-Message() {
     # Enter the DO loop
     do {
         # Write message
-        Write-Host $Message
+        Write-Host "$($counter) : $($Message)"
         # Increment our counter
         $counter++
-    # Keep looping while $counter is less than the Repeat param
+    # Loop untill counter equals Repeat
     }until($counter -eq $Repeat)
 }
 
@@ -244,7 +256,7 @@ Function Show-Message() {
     # counter is less than Repeat param
     while($counter -lt $Repeat) {
         # Write message
-        Write-Host $Message
+        Write-Host "$($counter) : $($Message)"
         # Increment our counter
         $counter++
     }
